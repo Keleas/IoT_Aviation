@@ -1,17 +1,14 @@
-import paho.mqtt.client as mqtt
-import time
 import collections
-import json
 import csv
-
-
-# data_json = open('data.csv', 'w')
-writer_csv = csv.writer(open('data.csv', 'w'), delimiter=';', lineterminator='\n')
-header = ['time', 'topic', 'message']
-# writer_csv.writerow(header)
+import time
+import paho.mqtt.client as mqtt
 
 
 def crete_tag_time():
+    """
+    Create local tag time
+    :return: str: local time structure
+    """
     s = time.localtime(time.time())
 
     year = str(s[0])
@@ -33,9 +30,24 @@ def crete_tag_time():
 
     ltime = str(year) + "-" + str(month) + "-" + str(day) + "_" + str(hours)
     ltime = ltime + ":" + str(m) + ":" + str(sec)
-    # print("time", ltime)
 
     return ltime
+
+
+# ---------------------------- #
+# Settings for online reader and writer
+# ---------------------------- #
+
+
+topic_name = '/aircrafts'  # /aircrafts or /data
+tag_time = crete_tag_time().replace(':', '-')
+data_name = f'DATA_{topic_name[1:]}_{tag_time}.csv'
+open(data_name, 'a').close()
+writer_csv = csv.writer(open(data_name, 'w'), delimiter=';', lineterminator='\n')
+header = ['time', 'topic', 'message']
+
+
+# ---------------------------- #
 
 
 # The callback for when the client receives a CONNACK response from the server.
@@ -47,8 +59,7 @@ def on_connect(consumer, userdata, flags, rc):
     if rc == 0:
         consumer.connected_bad = True
         consumer.bad_connected = False
-        consumer.subscribe("/data")
-        # consumer.subscribe("/aircrafts")
+        consumer.subscribe(topic_name)
     else:
         consumer.bad_connection_flag = True
         consumer.bad_count += 1
@@ -81,6 +92,7 @@ def message_handler(consumer, msg, topic):
 
 
 if __name__ == "__main__":
+    # run for logging data
     broker = '95.31.7.170'
     port = 1883
 
