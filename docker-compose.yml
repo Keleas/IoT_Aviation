@@ -19,7 +19,7 @@ services:
 
   consumer:
     container_name: mqtt_broker
-#    restart: on-failure
+    restart: on-failure
     depends_on:
       - eclipse-mosquitto
       - generator

@@ -45,10 +45,10 @@ tag_time = crete_tag_time().replace(':', '-')
 root = 'data/'
 if not os.path.isdir(root):
     os.mkdir(root)
-data_name = os.path.join(root, f'DATA_{topic_name[1:]}_{tag_time}.csv')
+data_name = '../../../input/final_df_2020-12-03_16-45-50.csv' #os.path.join(root, f'DATA_{topic_name[1:]}_{tag_time}.csv')
 open(data_name, 'a').close()
 writer_csv = csv.writer(open(data_name, 'w'), delimiter=';', lineterminator='\n')
-header = ['time', 'topic', 'message']
+header = ['message']
 
 
 # ---------------------------- #
