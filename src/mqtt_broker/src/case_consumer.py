@@ -2,6 +2,7 @@ import collections
 import csv
 import time
 import paho.mqtt.client as mqtt
+import os
 
 
 def crete_tag_time():
@@ -41,10 +42,13 @@ def crete_tag_time():
 
 topic_name = '/data'  # /aircrafts or /data
 tag_time = crete_tag_time().replace(':', '-')
-data_name = f'DATA_{topic_name[1:]}_{tag_time}.csv'
+root = 'data/'
+if not os.path.isdir(root):
+    os.mkdir(root)
+data_name = '../../../input/final_df_2020-12-03_16-45-50.csv' #os.path.join(root, f'DATA_{topic_name[1:]}_{tag_time}.csv')
 open(data_name, 'a').close()
 writer_csv = csv.writer(open(data_name, 'w'), delimiter=';', lineterminator='\n')
-header = ['time', 'topic', 'message']
+header = ['message']
 
 
 # ---------------------------- #
@@ -70,8 +74,8 @@ def on_connect(consumer, userdata, flags, rc):
 def on_message(consumer, userdata, msg):
     topic = msg.topic
     m_decode = str(msg.payload.decode('utf-8', 'ignore'))
-    # print('Message received', topic)
-    print('Message:', m_decode)
+    print('Message received', topic)
+    print('Message received', m_decode)
 
     message_handler(consumer, m_decode, topic)
 
@@ -85,20 +89,24 @@ def message_handler(consumer, msg, topic):
     data["message"] = msg
 
     rows = zip([data[col] for col in header])
-    for row in rows:
-        writer_csv.writerow(row)
+    try:
+        for row in rows:
+            writer_csv.writerow(row)
+        print('save data in', tag_time)
 
-    print('save data in', tag_time)
+    except Exception as e:
+        print("Couldn't parse raw data: %s" % msg, e)
 
 
 if __name__ == "__main__":
     # run for logging data
     # broker = '95.31.7.170'
     broker = '127.0.0.1'
+    # broker = '172.26.0.1'
     port = 1883
 
     consumer = mqtt.Client()
-    consumer.connect(broker, port, keepalive=60)
+    consumer.connect(broker, port, keepalive=20)
 
     consumer.on_connect = on_connect
     consumer.on_message = on_message
