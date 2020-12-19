@@ -1,0 +1,29 @@
+version: '3.3'
+services:
+  eclipse-mosquitto:
+    container_name: mosquitto
+    image: eclipse-mosquitto:latest
+    restart: always
+#    volumes:
+#      - ./mosquitto/config:/mosquitto/config
+#      - ./mosquitto/data:/mosquitto/data
+#      - ./mosquitto/log:/mosquitto/log
+    ports:
+      - 1883:1883
+
+  generator:
+    container_name: generator
+    image: vlasoff/aircraft_generator:latest
+    restart: always
+    network_mode: host
+
+  consumer:
+    container_name: mqtt_broker
+#    restart: on-failure
+    depends_on:
+      - eclipse-mosquitto
+      - generator
+    build:
+      context: ./src/mqtt_broker
+    volumes:
+      - ./input/broker_data:/src/mqtt_broker/src/data/
