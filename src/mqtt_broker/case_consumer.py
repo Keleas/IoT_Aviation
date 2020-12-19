@@ -39,7 +39,7 @@ def crete_tag_time():
 # ---------------------------- #
 
 
-topic_name = '/aircrafts'  # /aircrafts or /data
+topic_name = '/data'  # /aircrafts or /data
 tag_time = crete_tag_time().replace(':', '-')
 data_name = f'DATA_{topic_name[1:]}_{tag_time}.csv'
 open(data_name, 'a').close()
@@ -71,7 +71,7 @@ def on_message(consumer, userdata, msg):
     topic = msg.topic
     m_decode = str(msg.payload.decode('utf-8', 'ignore'))
     # print('Message received', topic)
-    # print('Message:', m_decode)
+    print('Message:', m_decode)
 
     message_handler(consumer, m_decode, topic)
 
@@ -93,7 +93,8 @@ def message_handler(consumer, msg, topic):
 
 if __name__ == "__main__":
     # run for logging data
-    broker = '95.31.7.170'
+    # broker = '95.31.7.170'
+    broker = '127.0.0.1'
     port = 1883
 
     consumer = mqtt.Client()
